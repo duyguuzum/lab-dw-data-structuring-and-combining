@@ -1,0 +1,109 @@
+---Challenge 1: Combining Data
+In this challenge, we will be working with the customer data from an insurance company, as we did in the two previous labs. The data can be found here:
+
+https://raw.githubusercontent.com/data-bootcamp-v4/data/main/file1.csv
+But this time, we got new data, which can be found in the following 2 CSV files located at the following links:
+
+https://raw.githubusercontent.com/data-bootcamp-v4/data/main/file2.csv
+https://raw.githubusercontent.com/data-bootcamp-v4/data/main/file3.csv
+Perform data cleaning and formatting using the main cleaning and formatting function created in the previous lab to clean and format the data.
+
+Combine the data from the three dataframes into a single dataframe, named "customer_data", using appropriate merging, concatenating, and joining techniques.
+
+Verify that the customer_data dataframe contains all the rows and columns from the three original dataframes.
+
+Observation:
+
+One option is to first combine the three datasets and then apply the cleaning function to the new combined dataset
+Another option would be to read the clean file you saved in the previous lab, and just clean the two new files and concatenate the three clean datasets
+
+import numpy as np
+import pandas as pd
+
+file1 = pd.read_csv('https://raw.githubusercontent.com/data-bootcamp-v4/data/main/file1.csv')
+file2 = pd.read_csv('https://raw.githubusercontent.com/data-bootcamp-v4/data/main/file2.csv')
+file3 = pd.read_csv('https://raw.githubusercontent.com/data-bootcamp-v4/data/main/file3.csv')
+
+#display(file1)
+#display(file2)
+#display(file3)
+
+customer_data = pd.concat([file1, file2, file3], axis=1)
+display(customer_data)
+
+from function import drop_null
+from function import clean_gender_column
+from function import drop_duplicates
+customer_data1 = customer_data.copy()
+
+#cd1=clean_gender_column(customer_data1)
+cd1=drop_null(customer_data1)
+
+cd1
+
+cd2=drop_duplicates(cd1)
+cd2
+
+---Challenge 2: Structuring Data
+In this challenge, we will continue to work with customer data from an insurance company, but we will use a dataset with more columns, called marketing_customer_analysis.csv, which can be found at the following link:
+
+https://raw.githubusercontent.com/data-bootcamp-v4/data/main/marketing_customer_analysis.csv
+
+This dataset contains information such as customer demographics, policy details, vehicle information, and the customer's response to the last marketing campaign. Our goal is to explore and analyze this data by performing data cleaning, formatting, and structuring.
+
+Exercise 1: Clean and Format the Data
+
+file4 = pd.read_csv('https://raw.githubusercontent.com/data-bootcamp-v4/data/main/marketing_customer_analysis.csv')
+
+customer_data_new = pd.concat([cd2, file4], axis=1)
+
+customer_data_new1=drop_null(customer_data_new)
+display(customer_data_new1)
+
+customer_data_new1.dtypes
+
+---While the dataset has been partially cleaned and formatted, we still need to perform several data cleaning tasks. Specifically, we need to standardize the column names, clean null values, convert the effective_to_date column to datetime, and extract the months from the dataset and store them in a separate column.
+
+To accomplish these tasks, we will use the functions created in the previous step to standardize the column names and deal with null values, and then we will apply additional functions to convert the effective_to_date column to datetime and extract the months.
+
+Save the clean dataset into a csv file.
+
+customer_data_new1['Effective To Date'] = pd.to_datetime(customer_data_new1['Effective To Date'], errors='coerce')
+customer_data_new1.dtypes
+
+customer_data_new1['month'] = customer_data_new1['Effective To Date'].dt.month_name()
+
+customer_data_new1['month']
+
+customer_data_new1.to_csv('customer_data_new1.csv',index = False, sep=";")
+
+---Exercise 2: Structuring Data
+You work at the marketing department and you want to know which sales channel brought the most sales in terms of total revenue. Using pivot, create a summary table showing the total revenue for each sales channel (branch, call center, web, and mail). Round the total revenue to 2 decimal points. Analyze the resulting table to draw insights.
+Create a pivot table that shows the average customer lifetime value per gender and education level. Analyze the resulting table to draw insights.
+You work at the customer service department and you want to know which months had the highest number of complaints by policy type category. Create a summary table showing the number of complaints by policy type and month. Show it in a long format table.
+In data analysis, a long format table is a way of structuring data in which each observation or measurement is stored in a separate row of the table. The key characteristic of a long format table is that each column represents a single variable, and each row represents a single observation of that variable.
+
+More information about long and wide format tables here: https://www.statology.org/long-vs-wide-data/
+
+customer = pd.read_csv('https://raw.githubusercontent.com/data-bootcamp-v4/data/main/marketing_customer_analysis.csv')
+customer['Income']
+
+display(customer)
+
+customer2 = drop_null(customer)
+display(customer2)
+customer3 = drop_duplicates(customer2)
+display(customer3)
+
+summary_table = customer3.pivot_table(values='Income', index='Sales Channel', aggfunc='sum').round(2)
+
+summary_table.head()
+
+customer3.columns
+
+summary_table2 = customer3.pivot_table(values='Customer Lifetime Value', index=['Gender','Education'], aggfunc='mean')
+display(summary_table2)
+
+summary_table3 = customer3.pivot_table(values='Number of Open Complaints', index='Policy Type')
+display(summary_table3)
+
